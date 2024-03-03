@@ -32,7 +32,6 @@ def create_new_member():
         conn.commit()
         conn.close()
 
-
     first_name = input("First Name: ")
     last_name = input("Last Name: ")
     address = input("Street Address: ")
@@ -55,3 +54,63 @@ def create_new_member():
     save_to_database(new_member)
 
     print("New member added successfully!")
+
+
+def remove_member(member_id):
+    try:
+        # Connect to the SQLite database
+        conn = sqlite3.connect('members.db')
+        cursor = conn.cursor()
+
+        # Check if the member with the given ID exists in the database
+        cursor.execute("SELECT * FROM members WHERE id = ?", (member_id,))
+        member = cursor.fetchone()
+        if member is None:
+            print("Member with ID", member_id, "not found.")
+            return
+
+        # Delete the member from the database
+        cursor.execute("DELETE FROM members WHERE id = ?", (member_id,))
+        conn.commit()
+        print("Member with ID", member_id, "successfully removed from the database.")
+
+    except sqlite3.Error as e:
+        print("Error removing member:", e)
+
+    finally:
+        if conn:
+            conn.close()
+
+
+def search_member(last_name):
+    try:
+        # Connect to the SQLite database
+        conn = sqlite3.connect('members.db')
+        cursor = conn.cursor()
+
+        # Search for members with the given last name
+        cursor.execute("SELECT * FROM members WHERE UPPER(last_name) = UPPER(?)", (last_name,))
+        members = cursor.fetchall()
+
+        if members:
+            print("Members with last name", last_name, "found:")
+            for member in members:
+                print("ID:", member[0])
+                print("First Name:", member[1])
+                print("Last Name:", member[2])
+                print("Address:", member[3])
+                print("City:", member[4])
+                print("State:", member[5])
+                print("Zipcode:", member[6])
+                print("Phone Number:", member[7])
+                print("Birthdate:", member[8])
+                print("--------------------")
+        else:
+            print("No members with last name", last_name, "found.")
+
+    except sqlite3.Error as e:
+        print("Error searching member:", e)
+
+    finally:
+        if conn:
+            conn.close()
