@@ -38,7 +38,12 @@ def create_new_member():
     city = input("City: ")
     state = input("State: ")
     zipcode = input("Zipcode: ")
-    phone_number = input("Phone Number: ")
+    while True:
+        phone_number = input("Phone Number (10 digits): ").strip()
+        if re.match(r'^\d{10}$', phone_number):
+            break
+        else:
+            print("Invalid phone number. Please enter exactly 10 digits.")
     while True:
         birthdate = input("Birthdate (dd/mm/yyyy): ")
         # validate birthdate format
@@ -115,7 +120,6 @@ def search_member(last_name):
         if conn:
             conn.close()
 
-
 def edit_member(member_id):
     try:
         # Connect to the SQLite database
@@ -149,8 +153,27 @@ def edit_member(member_id):
         new_city = input("City: ").strip() or member[4]
         new_state = input("State: ").strip() or member[5]
         new_zipcode = input("Zipcode: ").strip() or member[6]
-        new_phone_number = input("Phone Number: ").strip() or member[7]
-        new_birthdate = input("Birthdate (dd/mm/yyyy): ").strip() or member[8]
+        while True:
+            new_phone_number = input("Phone Number (10 digits): ").strip()
+            if not new_phone_number:
+                new_phone_number = member[7]  # Use previous value if left blank
+                break
+            # validate phone_number digits
+            elif re.match(r'^\d{10}$', new_phone_number):
+                break
+            else:
+                print("Invalid phone number. Please enter exactly 10 digits.")
+        while True:
+            new_birthdate = input("Birthdate (dd/mm/yyyy): ")
+            if not new_birthdate:
+                new_birthdate = member[8]  # Use previous value if left blank
+                break
+            # validate birthdate format
+            if re.match(r'^\d{2}/\d{2}/\d{4}$', new_birthdate):
+                break
+
+            else:
+                print("Invalid birthdate. Please use format dd/mm/yyyy.")
 
         # Update the member information in the database
         cursor.execute("UPDATE members SET first_name = ?, last_name = ?, address = ?, city = ?, state = ?, "
